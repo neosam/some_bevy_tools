@@ -16,7 +16,7 @@
 //!
 //! fn main() {
 //!     App::new()
-//!         .add_plugins(DefaultPlugins)
+//!     //    .add_plugins(DefaultPlugins)
 //!         .add_plugins(collision_detection::CollisionDetectionPlugin::<
 //!             Duck,
 //!             OtherDuck,
