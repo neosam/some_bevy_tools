@@ -1,9 +1,50 @@
+//! Provides a range type as components.
+//!
+//! Ranges can be used to define a floating point between two values.
+//! This can for example be used to define the health of an entity,
+//! its stamina, or its mana.
+//!
+//! It will also automatically modify the range based on the change_per_second
+//! attribute to automatically fill up mana or heal.
+//!
+//! When the range reaches a limit, an event will be emitted.  The events
+//! are StartRangeLimitReachedEvent and EndRangeLimitReachedEvent.  They can
+//! be used to trigger specific actions like dying.
+//!
+//! # Examples
+//! ```rust
+//! use bevy_helper_tools::range::{Range, RangePlugin};
+//! use bevy::prelude::*;
+//!
+//! #[derive(Default)]
+//! struct Health;
+//!
+//! App::new()
+//!     .add_plugins(RangePlugin::<Health>::default());
 use bevy::prelude::*;
 
+/// Quantize `value` to the nearest multiple of `step`.
+///
+/// # Examples
+/// ```rust
+/// use bevy_helper_tools::range::quantize;
+///
+/// assert_eq!(quantize(0.0, 1.0), 0.0);
+/// assert_eq!(quantize(1.0, 1.0), 1.0);
+/// assert_eq!(quantize(1.1, 1.0), 1.0);
+/// assert_eq!(quantize(1.5, 1.0), 2.0);
+/// assert_eq!(quantize(1.9, 1.0), 2.0);
+/// assert_eq!(quantize(2.0, 1.0), 2.0);
+/// assert_eq!(quantize(1.4, 0.5), 1.5);
+/// assert_eq!(quantize(1.6, 0.5), 1.5);
+/// ```
 pub fn quantize(value: f32, step: f32) -> f32 {
     (value / step).round() * step
 }
 
+/// The result of modifying a range.  It is Ok if the value is within the range,
+/// StartLimitReached if the value is below the range, and EndLimitReached if the
+/// value is above the range.
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub enum ModifyRangeResult {
     Ok,
@@ -11,6 +52,32 @@ pub enum ModifyRangeResult {
     EndLimitReached { high_limit: f32, value: f32 },
 }
 
+/// A range that contains a floating point between two values.
+///
+/// It uses a type parameter to allow for different
+/// types of ranges.  For example, it could be used to control the health of
+/// an entity.  Another type parameter could be used to control the speed of
+/// an entity or stamina.
+///
+/// The attribute change_per_second can be used to automatically modify the
+/// current value of the range.
+///
+/// # Examples
+/// ```rust
+/// use bevy_helper_tools::range::Range;
+///
+/// #[derive(Default)]
+/// struct Health;
+///
+/// let mut range = Range::<Health>::default()
+///     .with_start(0.0)
+///     .with_end(10.0)
+///     .with_current(5.0)
+///     .with_quantize(0.5);
+/// assert_eq!(range.get(), 5.0);
+/// range.set(6.0);
+/// assert_eq!(range.get(), 6.0);
+/// ```
 #[derive(Clone, Debug, Component, PartialEq)]
 pub struct Range<T> {
     start: f32,
@@ -22,6 +89,9 @@ pub struct Range<T> {
 }
 
 impl<T> Range<T> {
+    /// Create a new range.
+    /// The current value is set to the end value and quantize is set to 1.
+    /// The change_per_second is set to 0 and so the value will not be modified automatically.
     pub fn new(start: f32, end: f32) -> Range<T> {
         Range {
             start,
@@ -33,18 +103,23 @@ impl<T> Range<T> {
         }
     }
 
+    /// Create a new range with the current value set to the start value.
     pub fn with_start(self, start: f32) -> Range<T> {
         Range { start, ..self }
     }
+    /// Create a new range with the current value set to the end value.
     pub fn with_end(self, end: f32) -> Range<T> {
         Range { end, ..self }
     }
+    /// Create a new range with the current value set to the current value.
     pub fn with_current(self, current: f32) -> Range<T> {
         Range { current, ..self }
     }
+    /// Create a new range with the quantize value set to the quantize value.
     pub fn with_quantize(self, quantize: f32) -> Range<T> {
         Range { quantize, ..self }
     }
+    /// Create a new range with the change_per_second value set to the change_per_second value.
     pub fn with_change_per_second(self, change_per_second: f32) -> Range<T> {
         Range {
             change_per_second,
@@ -52,26 +127,37 @@ impl<T> Range<T> {
         }
     }
 
+    /// Set the quantize value.
     pub fn set_quantize(&mut self, quantize: f32) {
         self.quantize = quantize
     }
+    /// Get the quantize value.
     pub fn get_quantize(&self) -> f32 {
         self.quantize
     }
+    /// Set the start value.
     pub fn get_start(&self) -> f32 {
         self.start
     }
+    /// Set the end value.
     pub fn get_end(&self) -> f32 {
         self.end
     }
-
+    /// Set the current value.
     pub fn set_change_per_second(&mut self, change_per_second: f32) {
         self.change_per_second = change_per_second
     }
+    /// Get the current value.
     pub fn get_change_per_second(&self) -> f32 {
         self.change_per_second
     }
 
+    /// Set the current value.
+    /// The result is Ok if the value is within the range,
+    /// StartLimitReached if the value is equal or below the range, and
+    /// EndLimitReached if the value is equal or above the range.
+    /// If a value is outside the range, the current value is set to the
+    /// closest limit.
     pub fn set(&mut self, value: f32) -> ModifyRangeResult {
         self.current = value;
         if self.current <= self.start {
@@ -91,10 +177,18 @@ impl<T> Range<T> {
         }
     }
 
+    /// Get the current value.
+    /// The value will be quantized to the quantize value.
     pub fn get(&self) -> f32 {
         quantize(self.current, self.quantize)
     }
 
+    /// Modify the current value.
+    /// The result is Ok if the value is within the range,
+    /// StartLimitReached if the value is equal or below the range, and
+    /// EndLimitReached if the value is equal or above the range.
+    /// If a value is outside the range, the current value is set to the
+    /// closest limit.
     pub fn modify(&mut self, delta: f32) -> ModifyRangeResult {
         self.set(self.current + delta)
     }
@@ -106,17 +200,25 @@ impl<T> Default for Range<T> {
     }
 }
 
+/// An event which is sent when a range hits a start limit.
+///
+/// An example usage could be a health range which would mean the entity dies.
 #[derive(Debug, Event)]
 pub struct StartRangeLimitReachedEvent<T> {
     pub entity: Entity,
     _phantom: std::marker::PhantomData<T>,
 }
+
+/// An event which is sent when a range hits an end limit.
+///
+/// For example for stamina it could mean that the stamina is full again.
 #[derive(Debug, Event)]
 pub struct EndRangeLimitReachedEvent<T> {
     pub entity: Entity,
     _phantom: std::marker::PhantomData<T>,
 }
 
+/// A system to update the range values based on their change_per_second attribute.
 pub fn update_range<T: Send + Sync + 'static>(
     mut range_query: Query<(Entity, &mut Range<T>)>,
     time: Res<Time>,
@@ -143,6 +245,11 @@ pub fn update_range<T: Send + Sync + 'static>(
     }
 }
 
+/// Add support for `Range`s in your game.
+///
+/// It will produce StartRangeLimitReachedEvent and EndRangeLimitReachedEvent when the
+/// range reaches a limit.  It will also update the Range component based on the change_per_second
+/// attribute.
 #[derive(Debug, Default)]
 pub struct RangePlugin<T> {
     _phantom: std::marker::PhantomData<T>,
