@@ -4,4 +4,5 @@ pub mod collision_detection;
 pub mod collision_detection;
 pub mod despawn;
 pub mod loading;
+pub mod post_processing_shader;
 pub mod range;
