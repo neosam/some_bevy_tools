@@ -5,3 +5,4 @@ pub mod collision_detection;
 pub mod despawn;
 pub mod loading;
 pub mod range;
+pub mod split_screen;
