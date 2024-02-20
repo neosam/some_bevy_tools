@@ -30,7 +30,7 @@ pub fn main() {
             TextureAssets::default(),
             GameState::Loading,
         ))
-        .add_state::<GameState>()
+        .init_state::<GameState>()
         .add_systems(OnEnter(GameState::InGame), init_ingame)
         .run();
 }

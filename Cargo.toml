@@ -21,10 +21,10 @@ bevy_rapier2d = ["dep:bevy_rapier2d"]
 bevy_rapier3d = ["dep:bevy_rapier3d"]
 
 [dependencies]
-bevy = "0.12.1"
-bevy_rapier2d = { version = "0.23.0", features = [
+bevy = "0.13.0"
+bevy_rapier2d = { version = "0.25.0", features = [
     "debug-render-2d",
 ], optional = true }
-bevy_rapier3d = { version = "0.23.0", features = [
+bevy_rapier3d = { version = "0.25.0", features = [
     "debug-render",
 ], optional = true }

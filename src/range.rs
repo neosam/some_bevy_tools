@@ -239,7 +239,7 @@ pub fn update_range<T: Send + Sync + 'static>(
                 end_range_limit_reached_event_writer.send(EndRangeLimitReachedEvent {
                     entity,
                     _phantom: std::marker::PhantomData,
-                })
+                });
             }
         }
     }
