@@ -32,6 +32,7 @@ impl SbsCameraBundle {
 }
 
 /// A system which recalculates the position of the left and right camera.
+#[allow(clippy::type_complexity)]
 pub fn update_sbs_camera_transform(
     sbs_camera: Query<
         (&SbsCameraGap, &Transform),
@@ -72,7 +73,7 @@ pub struct Sbs3DPlugin;
 
 impl Plugin for Sbs3DPlugin {
     fn build(&self, app: &mut App) {
-        app.add_plugins(split_screen::SplitScreenPlugin::default())
+        app.add_plugins(split_screen::SplitScreenPlugin)
             .add_systems(Update, update_sbs_camera_transform);
     }
 }
