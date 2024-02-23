@@ -7,3 +7,5 @@ pub mod loading;
 pub mod range;
 pub mod sbs_3d;
 pub mod split_screen;
+pub mod third_party_camera;
+pub mod third_party_controller;
