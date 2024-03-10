@@ -3,6 +3,7 @@ pub mod collision_detection;
 #[cfg(feature = "bevy_rapier3d")]
 pub mod collision_detection;
 pub mod despawn;
+pub mod input;
 pub mod loading;
 pub mod range;
 pub mod sbs_3d;
