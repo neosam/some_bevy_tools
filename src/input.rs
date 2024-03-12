@@ -35,10 +35,11 @@
 //! }
 //!
 //!  App::new()
-//!      .add_plugins(DefaultPlugins)
+//!      //.add_plugins(DefaultPlugins)
 //!      .add_plugins(input::InputMappingPlugin::<AppAction>::default())
 //!      .add_systems(Startup, setup)
 //!      .add_systems(Update, action_handler);
+//!      //.run();
 //! ```
 
 use bevy::{prelude::*, utils::hashbrown::HashSet};
