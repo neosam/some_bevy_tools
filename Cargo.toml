@@ -3,6 +3,9 @@ name = "some_bevy_tools"
 version = "0.1.0"
 edition = "2021"
 license = "MIT OR Apache-2.0 OR CC0-1.0"
+authors = ["Simon Goller <simon.goller@posteo.de>"]
+repository = "https://github.com/neosam/some_bevy_tools"
+homepage = "https://github.com/neosam/some_bevy_tools"
 
 # Compile with Performance Optimizations:
 # https://bevyengine.org/learn/book/getting-started/setup/#compile-with-performance-optimizations
