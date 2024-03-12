@@ -1,3 +1,55 @@
+//! Module to manage asset loading.
+//!
+//! ## Example
+//! ```rust
+//! use bevy::prelude::*;
+//! use bevy_helper_tools::loading as easy_loading;
+//!
+//! // We need a loading state and and a destination state which will be entered after loading is done.
+//! #[derive(States, PartialEq, Eq, Debug, Default, Hash, Clone, Copy)]
+//! pub enum GameState {
+//!     #[default]
+//!     Loading,
+//!     InGame,
+//! }
+//!
+//! // Then we need a resource where the assets should be stored.
+//! // It can only be of one type, in this case `Image`.
+//! #[derive(Resource, Default, Reflect, Clone)]
+//! pub struct TextureAssets {
+//!     pub ducky: Handle<Image>,
+//! }
+//! // And now we define a mapping between the attribute name and the path in the assets.
+//! impl easy_loading::EasyAssetLoader for TextureAssets {
+//!     type AssetType = Image;
+//!     fn asset_mapper() -> &'static [(&'static str, &'static str)] {
+//!         &[("ducky", "ducky.png")]
+//!     }
+//! }
+//!
+//! // In the `InGame` state, the assets will be already loaded.
+//! pub fn init_ingame(mut commands: Commands, assets: Res<TextureAssets>) {
+//!     commands.spawn(SpriteBundle {
+//!         texture: assets.ducky.clone(),
+//!         transform: Transform::from_xyz(300.0, 0.0, 0.0),
+//!         ..Default::default()
+//!     });
+//! }
+//!
+//! App::new()
+//!     //.add_plugins(DefaultPlugins)
+//!     .add_plugins(easy_loading::LoadingPlugin(
+//!         GameState::Loading,
+//!         GameState::InGame,
+//!     ))
+//!     .add_plugins(easy_loading::LoadPluginAssets(
+//!         TextureAssets::default(),
+//!         GameState::Loading,
+//!     ))
+//!     .init_state::<GameState>()
+//!     .add_systems(OnEnter(GameState::InGame), init_ingame);
+//!     //.run();
+//! ```
 use bevy::prelude::*;
 
 /// Allows to automatically handle asset loading.

@@ -2,6 +2,24 @@
 //!
 //! Split screen is a feature that allows you to display two cameras side by side.
 //! It is useful for games that have two players.
+//!
+//! ## Example
+//! ```rust
+//! use bevy::prelude::*;
+//! use bevy_helper_tools::split_screen;
+//!
+//! // Split screen requires a `LeftCamera` and a `RightCamera`.
+//! fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
+//!     commands.spawn((Camera2dBundle::default(), split_screen::LeftCamera));
+//!     commands.spawn((Camera2dBundle::default(), split_screen::RightCamera));
+//! }
+//!
+//! App::new()
+//!     //.add_plugins(DefaultPlugins)
+//!     .add_plugins(split_screen::SplitScreenPlugin::default())
+//!     .add_systems(Startup, setup);
+//!     //.run();
+//! ```
 
 use bevy::{prelude::*, render::camera::Viewport, window::WindowResized};
 

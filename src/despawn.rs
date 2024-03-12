@@ -1,4 +1,29 @@
 //! Module which contains tools which help to despawn entities.
+//!
+//! ## Example
+//! ```rust
+//! use bevy::prelude::*;
+//!
+//! use bevy_helper_tools::despawn;
+//!
+//! fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
+//!     commands.spawn(Camera2dBundle::default());
+//!     commands.spawn((
+//!         SpriteBundle {
+//!             texture: asset_server.load("ducky.png"),
+//!             ..Default::default()
+//!         },
+//!         despawn::AutoDespawn::new(3.0),
+//!     ));
+//! }
+//!
+//! App::new()
+//!     //.add_plugins(DefaultPlugins)
+//!     .add_plugins(despawn::AutoDespawnPlugin)
+//!     .add_systems(Startup, setup);
+//!     //.run();
+//!
+//! ```
 
 use bevy::prelude::*;
 

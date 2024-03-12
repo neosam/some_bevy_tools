@@ -1,4 +1,38 @@
 //! Support for 3D output in SBS format for 3D glasses.
+//!
+//! ## Example
+//! ```rust
+//! use bevy::prelude::*;
+//! use bevy_helper_tools::sbs_3d;
+//! use bevy_helper_tools::split_screen;
+//!
+//! // The SBS camera requires two actual cameras because SBS is basically just a split screen.
+//! // Additionally, the SBS camera is required. It must be used to to position the camera.
+//! fn setup_sbs(
+//!     mut commands: Commands,
+//! ) {
+//!     commands.spawn((
+//!         Camera3dBundle::default(),
+//!         split_screen::LeftCamera,
+//!     ));
+//!     commands.spawn((
+//!         Camera3dBundle::default(),
+//!         split_screen::RightCamera,
+//!     ));
+//!     commands.spawn(
+//!         sbs_3d::SbsCameraBundle::from_transform_and_gap(
+//!             Transform::from_xyz(1.0, 1.5, 2.0).looking_at(Vec3::ZERO, Vec3::Y),
+//!             0.3,
+//!         )
+//!     );
+//! }
+//!
+//! App::new()
+//!     //.add_plugins(DefaultPlugins)
+//!     .add_plugins(sbs_3d::Sbs3DPlugin)
+//!     .add_systems(Startup, setup_sbs);
+//!     //.run();
+//! ```
 
 use crate::split_screen;
 use bevy::prelude::*;
