@@ -20,7 +20,12 @@ Currently supported features are:
 Additionally, I try to document each module with at least one example. This should ensure that
 there are no accidential breaking changes.
 
-## CI (copied from the bevy starter template)
+## Version history and Bevy version
+| Version | Bevy |
+| ------- | ---- |
+| 0.1     | 0.13 |
+
+## CI (copied from the Bevy starter template)
 
 Definition: [.github/workflows/ci.yaml](./.github/workflows/ci.yaml)
 
