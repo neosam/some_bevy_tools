@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use bevy_helper_tools::loading as easy_loading;
+use some_bevy_tools::loading as easy_loading;
 
 #[derive(States, PartialEq, Eq, Debug, Default, Hash, Clone, Copy)]
 pub enum GameState {

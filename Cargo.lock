@@ -594,15 +594,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "bevy_helper_tools"
-version = "0.1.0"
-dependencies = [
- "bevy",
- "bevy_rapier2d",
- "bevy_rapier3d",
-]
-
-[[package]]
 name = "bevy_hierarchy"
 version = "0.13.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3370,6 +3361,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "74212e6bbe9a4352329b2f68ba3130c15a3f26fe88ff22dbdc6cdd58fa85e99c"
 dependencies = [
  "serde",
+]
+
+[[package]]
+name = "some_bevy_tools"
+version = "0.1.0"
+dependencies = [
+ "bevy",
+ "bevy_rapier2d",
+ "bevy_rapier3d",
 ]
 
 [[package]]

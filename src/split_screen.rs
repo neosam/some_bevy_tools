@@ -6,7 +6,7 @@
 //! ## Example
 //! ```rust
 //! use bevy::prelude::*;
-//! use bevy_helper_tools::split_screen;
+//! use some_bevy_tools::split_screen;
 //!
 //! // Split screen requires a `LeftCamera` and a `RightCamera`.
 //! fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {

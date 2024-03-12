@@ -5,7 +5,7 @@
 #![allow(clippy::too_many_arguments, clippy::type_complexity)]
 
 use bevy::prelude::*;
-use bevy_helper_tools::range;
+use some_bevy_tools::range;
 
 static CHANGE_PER_SECOND: f32 = 50.0;
 

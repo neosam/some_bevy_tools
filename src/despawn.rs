@@ -3,8 +3,7 @@
 //! ## Example
 //! ```rust
 //! use bevy::prelude::*;
-//!
-//! use bevy_helper_tools::despawn;
+//! use some_bevy_tools::despawn;
 //!
 //! fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
 //!     commands.spawn(Camera2dBundle::default());

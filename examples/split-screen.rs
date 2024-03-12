@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use bevy_helper_tools::split_screen;
+use some_bevy_tools::split_screen;
 
 pub fn main() {
     App::new()

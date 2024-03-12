@@ -1,6 +1,6 @@
 use bevy::prelude::*;
-use bevy_helper_tools::collision_detection;
 use bevy_rapier2d::prelude::*;
+use some_bevy_tools::collision_detection;
 
 #[derive(Debug, Default, Component)]
 struct Duck;

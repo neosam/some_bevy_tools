@@ -13,8 +13,8 @@
 //!
 //! # Examples
 //! ```rust
-//! use bevy_helper_tools::range::{Range, RangePlugin};
 //! use bevy::prelude::*;
+//! use some_bevy_tools::range::{Range, RangePlugin};
 //!
 //! #[derive(Default)]
 //! struct Health;
@@ -27,7 +27,7 @@ use bevy::prelude::*;
 ///
 /// # Examples
 /// ```rust
-/// use bevy_helper_tools::range::quantize;
+/// use some_bevy_tools::range::quantize;
 ///
 /// assert_eq!(quantize(0.0, 1.0), 0.0);
 /// assert_eq!(quantize(1.0, 1.0), 1.0);
@@ -64,7 +64,7 @@ pub enum ModifyRangeResult {
 ///
 /// # Examples
 /// ```rust
-/// use bevy_helper_tools::range::Range;
+/// use some_bevy_tools::range::Range;
 ///
 /// #[derive(Default)]
 /// struct Health;

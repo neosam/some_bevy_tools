@@ -9,8 +9,8 @@
 use bevy::ecs::system::SystemId;
 use bevy::prelude::*;
 use bevy::window::WindowResized;
-use bevy_helper_tools::sbs_3d;
-use bevy_helper_tools::split_screen;
+use some_bevy_tools::sbs_3d;
+use some_bevy_tools::split_screen;
 
 pub fn main() {
     App::new()

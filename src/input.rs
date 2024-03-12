@@ -5,8 +5,8 @@
 //! ## Example
 //! ```rust
 //! use bevy::prelude::*;
-//! use bevy_helper_tools::input;
-//! use bevy_helper_tools::input::UserInput::*;
+//! use some_bevy_tools::input;
+//! use some_bevy_tools::input::UserInput::*;
 //!
 //! #[derive(Clone, Eq, PartialEq, Hash)]
 //! enum AppAction {

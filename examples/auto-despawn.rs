@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use bevy_helper_tools::despawn;
+use some_bevy_tools::despawn;
 
 pub fn main() {
     App::new()

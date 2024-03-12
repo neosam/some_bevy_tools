@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 use bevy::window::{CursorGrabMode, PrimaryWindow};
-use bevy_helper_tools::{third_party_camera, third_party_controller};
+use some_bevy_tools::{third_party_camera, third_party_controller};
 
 pub fn main() {
     App::new()

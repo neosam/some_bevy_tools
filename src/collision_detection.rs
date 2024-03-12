@@ -5,8 +5,8 @@
 //!
 //! # Examples
 //! ```rust
-//! use bevy_helper_tools::collision_detection;
 //! use bevy::prelude::*;
+//! use some_bevy_tools::collision_detection;
 //!
 //! #[derive(Debug, Component, Default)]
 //! struct Duck;

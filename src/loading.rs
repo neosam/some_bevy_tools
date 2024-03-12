@@ -3,7 +3,7 @@
 //! ## Example
 //! ```rust
 //! use bevy::prelude::*;
-//! use bevy_helper_tools::loading as easy_loading;
+//! use some_bevy_tools::loading as easy_loading;
 //!
 //! // We need a loading state and and a destination state which will be entered after loading is done.
 //! #[derive(States, PartialEq, Eq, Debug, Default, Hash, Clone, Copy)]
