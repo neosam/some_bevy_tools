@@ -49,12 +49,38 @@ use bevy::{
 use std::hash::Hash;
 
 #[derive(Resource)]
-pub struct InputMapping<Action> {
+pub struct InputMapping<Action: PartialEq> {
     mapping: Vec<InputMappingItem<Action>>,
     slider_mapping: Vec<DirectionalSliderMappingItem<Action>>,
 }
+impl<Action: Eq> InputMapping<Action> {
+    pub fn add_key_mapping(&mut self, item: InputMappingItem<Action>) {
+        self.mapping.push(item)
+    }
+    pub fn remove_key_mapping(&mut self, item: &InputMappingItem<Action>) {
+        self.mapping.retain(|i| i != item)
+    }
 
-impl<Action: Clone, const N: usize> From<[(UserInput, Action); N]> for InputMapping<Action> {
+    pub fn add_directional_mapping(&mut self, item: DirectionalSliderMappingItem<Action>) {
+        self.slider_mapping.push(item)
+    }
+    pub fn remove_directional_mapping(&mut self, item: &DirectionalSliderMappingItem<Action>) {
+        self.slider_mapping.retain(|i| {
+            i.action != item.action || i.slider_mapping_type != item.slider_mapping_type
+        })
+    }
+
+    pub fn get_mappings_as_slice(&self) -> &[InputMappingItem<Action>] {
+        &self.mapping
+    }
+    pub fn get_directional_mappings_as_slice(&self) -> &[DirectionalSliderMappingItem<Action>] {
+        &self.slider_mapping
+    }
+}
+
+impl<Action: Clone + PartialEq, const N: usize> From<[(UserInput, Action); N]>
+    for InputMapping<Action>
+{
     fn from(item: [(UserInput, Action); N]) -> Self {
         Self {
             mapping: item.iter().cloned().map(Into::into).collect(),
@@ -63,7 +89,7 @@ impl<Action: Clone, const N: usize> From<[(UserInput, Action); N]> for InputMapp
     }
 }
 
-impl<Action: Clone, const N: usize, const M: usize>
+impl<Action: Clone + PartialEq, const N: usize, const M: usize>
     From<(
         [(UserInput, Action); N],
         [(SliderMappingType, Action, f32); M],
@@ -81,7 +107,7 @@ impl<Action: Clone, const N: usize, const M: usize>
         }
     }
 }
-impl<Action: Clone, const N: usize, const M: usize>
+impl<Action: Clone + PartialEq, const N: usize, const M: usize>
     From<(
         [(UserInput, Action); N],
         [(SliderMappingType, Action, f32, f32); M],
@@ -101,12 +127,13 @@ impl<Action: Clone, const N: usize, const M: usize>
 }
 
 /// Maps a user input to a specific action.
-pub struct InputMappingItem<Action> {
+#[derive(PartialEq)]
+pub struct InputMappingItem<Action: PartialEq> {
     pub input: UserInput,
     pub action: Action,
 }
 
-impl<Action> From<(UserInput, Action)> for InputMappingItem<Action> {
+impl<Action: PartialEq> From<(UserInput, Action)> for InputMappingItem<Action> {
     fn from(item: (UserInput, Action)) -> Self {
         Self {
             input: item.0,
@@ -115,7 +142,7 @@ impl<Action> From<(UserInput, Action)> for InputMappingItem<Action> {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, PartialEq, Eq)]
 pub enum UserInput {
     KeyDown(KeyCode),
     KeyUp(KeyCode),
@@ -124,7 +151,7 @@ pub enum UserInput {
     MouseScrollDown,
 }
 
-#[derive(Clone)]
+#[derive(Clone, PartialEq)]
 pub struct DirectionalSliderMappingItem<Action> {
     pub slider_mapping_type: SliderMappingType,
     pub action: Action,
@@ -132,7 +159,7 @@ pub struct DirectionalSliderMappingItem<Action> {
     pub factor_y: f32,
 }
 
-#[derive(Clone)]
+#[derive(Clone, PartialEq)]
 pub enum SliderMappingType {
     MouseMove(f32),
 }
@@ -248,5 +275,58 @@ impl<Action: Clone + Eq + Hash + Send + Sync + 'static> Plugin for InputMappingP
         app.add_event::<ActionEvent<Action>>()
             .add_event::<DirectionSliderEvent<Action>>()
             .add_systems(Update, input_mapping_system::<Action>);
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn input_adding_and_removing_mappings() {
+        let mut mapping: InputMapping<i32> = (
+            [
+                (UserInput::KeyDown(KeyCode::KeyA), 1),
+                (UserInput::KeyUp(KeyCode::KeyA), 2),
+            ],
+            [(SliderMappingType::MouseMove(0.5), 3, 0.5, 0.5)],
+        )
+            .into();
+        assert_eq!(2, mapping.get_mappings_as_slice().len());
+        assert_eq!(1, mapping.get_directional_mappings_as_slice().len());
+
+        mapping.add_key_mapping((UserInput::KeyPressed(KeyCode::ArrowUp), 3).into());
+        assert_eq!(3, mapping.get_mappings_as_slice().len());
+        assert_eq!(1, mapping.get_directional_mappings_as_slice().len());
+
+        mapping.add_directional_mapping((SliderMappingType::MouseMove(0.5), 4, 0.5, 0.5).into());
+        assert_eq!(3, mapping.get_mappings_as_slice().len());
+        assert_eq!(2, mapping.get_directional_mappings_as_slice().len());
+
+        mapping.remove_key_mapping(&(UserInput::KeyDown(KeyCode::KeyA), 1).into());
+        assert_eq!(2, mapping.get_mappings_as_slice().len());
+        assert_eq!(2, mapping.get_directional_mappings_as_slice().len());
+
+        mapping
+            .remove_directional_mapping(&(SliderMappingType::MouseMove(0.5), 3, 0.5, 0.5).into());
+        assert_eq!(2, mapping.get_mappings_as_slice().len());
+        assert_eq!(1, mapping.get_directional_mappings_as_slice().len());
+
+        mapping
+            .remove_directional_mapping(&(SliderMappingType::MouseMove(0.5), 4, 0.1, 0.1).into());
+        assert_eq!(2, mapping.get_mappings_as_slice().len());
+        assert_eq!(0, mapping.get_directional_mappings_as_slice().len());
+
+        mapping.remove_key_mapping(&(UserInput::KeyDown(KeyCode::KeyZ), 1).into());
+        assert_eq!(2, mapping.get_mappings_as_slice().len());
+        assert_eq!(0, mapping.get_directional_mappings_as_slice().len());
+
+        mapping.remove_key_mapping(&(UserInput::KeyUp(KeyCode::KeyA), 1).into());
+        assert_eq!(2, mapping.get_mappings_as_slice().len());
+        assert_eq!(0, mapping.get_directional_mappings_as_slice().len());
+
+        mapping.remove_key_mapping(&(UserInput::KeyUp(KeyCode::KeyA), 2).into());
+        assert_eq!(1, mapping.get_mappings_as_slice().len());
+        assert_eq!(0, mapping.get_directional_mappings_as_slice().len());
     }
 }
