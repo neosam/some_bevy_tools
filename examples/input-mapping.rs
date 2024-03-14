@@ -1,6 +1,6 @@
 use bevy::prelude::*;
-use some_bevy_tools::input;
 use some_bevy_tools::input::UserInput::*;
+use some_bevy_tools::input::{self, InputMapping};
 
 #[derive(Debug, Default, Component)]
 struct Duck;
@@ -33,20 +33,19 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
         },
         Duck,
     ));
-    commands.insert_resource(input::InputMapping::<AppAction>::from(
-        [
-            (KeyPressed(KeyCode::ArrowUp), AppAction::MoveUp),
-            (KeyPressed(KeyCode::KeyW), AppAction::MoveUp),
-            (KeyPressed(KeyCode::ArrowDown), AppAction::MoveDown),
-            (KeyPressed(KeyCode::KeyS), AppAction::MoveDown),
-            (KeyPressed(KeyCode::ArrowLeft), AppAction::MoveLeft),
-            (KeyPressed(KeyCode::KeyA), AppAction::MoveLeft),
-            (KeyPressed(KeyCode::ArrowRight), AppAction::MoveRight),
-            (KeyPressed(KeyCode::KeyD), AppAction::MoveRight),
-            (KeyPressed(KeyCode::Escape), AppAction::Exit),
-        ]
-        .as_ref(),
-    ));
+    let input_mapping: InputMapping<AppAction> = [
+        (KeyPressed(KeyCode::ArrowUp), AppAction::MoveUp),
+        (KeyPressed(KeyCode::KeyW), AppAction::MoveUp),
+        (KeyPressed(KeyCode::ArrowDown), AppAction::MoveDown),
+        (KeyPressed(KeyCode::KeyS), AppAction::MoveDown),
+        (KeyPressed(KeyCode::ArrowLeft), AppAction::MoveLeft),
+        (KeyPressed(KeyCode::KeyA), AppAction::MoveLeft),
+        (KeyPressed(KeyCode::ArrowRight), AppAction::MoveRight),
+        (KeyPressed(KeyCode::KeyD), AppAction::MoveRight),
+        (KeyPressed(KeyCode::Escape), AppAction::Exit),
+    ]
+    .into();
+    commands.insert_resource(input_mapping);
 }
 
 fn action_handler(

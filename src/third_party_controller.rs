@@ -5,7 +5,8 @@ use bevy::{
     prelude::*,
 };
 
-use crate::third_party_camera;
+use crate::input::SliderMappingType;
+use crate::{input, third_party_camera};
 
 #[derive(Component)]
 pub struct ThirdPartyController {
@@ -13,9 +14,27 @@ pub struct ThirdPartyController {
     pub max_distance: f32,
 }
 
+#[derive(Clone, Eq, PartialEq, Hash)]
+pub enum CharacterControllerEvent {
+    Turn,
+}
+
+pub fn default_character_controller_event_mapping() -> input::InputMapping<CharacterControllerEvent>
+{
+    input::InputMapping::from((
+        [],
+        [(
+            SliderMappingType::MouseMove(10.0),
+            CharacterControllerEvent::Turn,
+            0.005,
+            -0.005,
+        )],
+    ))
+}
+
 pub fn third_party_camera_controller_system(
     mut scroll_events: EventReader<MouseWheel>,
-    mut motion_events: EventReader<mouse::MouseMotion>,
+    mut slider_events: EventReader<input::DirectionSliderEvent<CharacterControllerEvent>>,
     mut third_party_query: Query<(
         &ThirdPartyController,
         &mut third_party_camera::ThirdPartyCamera,
@@ -33,11 +52,10 @@ pub fn third_party_camera_controller_system(
         }
     }
 
-    for ev in motion_events.read() {
+    for ev in slider_events.read() {
         for (_controller, mut camera) in third_party_query.iter_mut() {
-            camera.rotate_y -= ev.delta.x * 0.005;
-            camera.rotate_x =
-                (camera.rotate_x - ev.delta.y * -0.005).clamp(-PI / 2.0 + 0.01, PI / 2.0 - 0.01);
+            camera.rotate_y -= ev.x;
+            camera.rotate_x = (camera.rotate_x - ev.y).clamp(-PI / 2.0 + 0.01, PI / 2.0 - 0.01);
         }
     }
 }
@@ -45,7 +63,11 @@ pub fn third_party_camera_controller_system(
 pub struct ThirdPartyControllerPlugin;
 impl Plugin for ThirdPartyControllerPlugin {
     fn build(&self, app: &mut App) {
-        app.add_plugins(third_party_camera::ThirdPartyCameraPlugin)
-            .add_systems(Update, third_party_camera_controller_system);
+        app.add_plugins((
+            third_party_camera::ThirdPartyCameraPlugin,
+            input::InputMappingPlugin::<CharacterControllerEvent>::default(),
+        ))
+        .insert_resource(default_character_controller_event_mapping())
+        .add_systems(Update, third_party_camera_controller_system);
     }
 }
