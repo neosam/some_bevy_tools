@@ -17,6 +17,9 @@ pub enum CharacterControllerEvent {
     IncreaseCameraDistance,
     DecreaseCameraDistance,
     MoveForward,
+    MoveBackward,
+    MoveLeft,
+    MoveRight,
 }
 
 pub fn default_character_controller_event_mapping() -> input::InputMapping<CharacterControllerEvent>
@@ -34,6 +37,18 @@ pub fn default_character_controller_event_mapping() -> input::InputMapping<Chara
             (
                 input::UserInput::KeyPressed(KeyCode::KeyW),
                 CharacterControllerEvent::MoveForward,
+            ),
+            (
+                input::UserInput::KeyPressed(KeyCode::KeyS),
+                CharacterControllerEvent::MoveBackward,
+            ),
+            (
+                input::UserInput::KeyPressed(KeyCode::KeyA),
+                CharacterControllerEvent::MoveLeft,
+            ),
+            (
+                input::UserInput::KeyPressed(KeyCode::KeyD),
+                CharacterControllerEvent::MoveRight,
             ),
         ],
         [(
@@ -97,6 +112,45 @@ pub fn move_controller_plane(
                             rotation_y.sin() * 10.0 * time.delta_seconds();
                         target_transform.translation.z -=
                             rotation_y.cos() * 10.0 * time.delta_seconds();
+
+                        target_transform.rotation = Quat::from_rotation_y(rotation_y);
+                    }
+                }
+            }
+            CharacterControllerEvent::MoveBackward => {
+                for camera in camera_query.iter() {
+                    if let Ok(mut target_transform) = target_query.get_mut(camera.target) {
+                        let rotation_y = camera.rotate_y;
+                        target_transform.translation.x +=
+                            rotation_y.sin() * 10.0 * time.delta_seconds();
+                        target_transform.translation.z +=
+                            rotation_y.cos() * 10.0 * time.delta_seconds();
+
+                        target_transform.rotation = Quat::from_rotation_y(rotation_y);
+                    }
+                }
+            }
+            CharacterControllerEvent::MoveLeft => {
+                for camera in camera_query.iter() {
+                    if let Ok(mut target_transform) = target_query.get_mut(camera.target) {
+                        let rotation_y = camera.rotate_y;
+                        target_transform.translation.x -=
+                            rotation_y.cos() * 10.0 * time.delta_seconds();
+                        target_transform.translation.z +=
+                            rotation_y.sin() * 10.0 * time.delta_seconds();
+
+                        target_transform.rotation = Quat::from_rotation_y(rotation_y);
+                    }
+                }
+            }
+            CharacterControllerEvent::MoveRight => {
+                for camera in camera_query.iter() {
+                    if let Ok(mut target_transform) = target_query.get_mut(camera.target) {
+                        let rotation_y = camera.rotate_y;
+                        target_transform.translation.x +=
+                            rotation_y.cos() * 10.0 * time.delta_seconds();
+                        target_transform.translation.z -=
+                            rotation_y.sin() * 10.0 * time.delta_seconds();
 
                         target_transform.rotation = Quat::from_rotation_y(rotation_y);
                     }
