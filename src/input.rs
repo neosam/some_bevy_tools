@@ -14,12 +14,11 @@
 //! }
 //!
 //! fn setup(mut commands: Commands) {
-//!     commands.insert_resource(input::InputMapping::<AppAction>::from(
+//!     commands.insert_resource::<input::InputMapping<AppAction>>(
 //!         [
 //!             (KeyPressed(KeyCode::Escape), AppAction::Exit),
-//!         ]
-//!         .as_ref(),
-//!     ));
+//!         ].into()
+//!     );
 //! }
 //!
 //! fn action_handler(
