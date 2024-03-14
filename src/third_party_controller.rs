@@ -16,6 +16,7 @@ pub enum CharacterControllerEvent {
     Turn,
     IncreaseCameraDistance,
     DecreaseCameraDistance,
+    MoveForward,
 }
 
 pub fn default_character_controller_event_mapping() -> input::InputMapping<CharacterControllerEvent>
@@ -29,6 +30,10 @@ pub fn default_character_controller_event_mapping() -> input::InputMapping<Chara
             (
                 input::UserInput::MouseScrollUp,
                 CharacterControllerEvent::DecreaseCameraDistance,
+            ),
+            (
+                input::UserInput::KeyPressed(KeyCode::KeyW),
+                CharacterControllerEvent::MoveForward,
             ),
         ],
         [(
@@ -48,7 +53,6 @@ pub fn third_party_camera_controller_system(
         &mut third_party_camera::ThirdPartyCamera,
     )>,
 ) {
-    bevy::log::info!("third_party-camera-controller-system");
     for ev in action_events.read() {
         match ev.action {
             CharacterControllerEvent::IncreaseCameraDistance => {
@@ -73,6 +77,32 @@ pub fn third_party_camera_controller_system(
         for (_controller, mut camera) in third_party_query.iter_mut() {
             camera.rotate_y -= ev.x;
             camera.rotate_x = (camera.rotate_x - ev.y).clamp(-PI / 2.0 + 0.01, PI / 2.0 - 0.01);
+        }
+    }
+}
+
+pub fn move_controller_plane(
+    camera_query: Query<&third_party_camera::ThirdPartyCamera, With<ThirdPartyController>>,
+    mut target_query: Query<&mut Transform, Without<ThirdPartyController>>,
+    mut action_events: EventReader<input::ActionEvent<CharacterControllerEvent>>,
+    time: Res<Time>,
+) {
+    for ev in action_events.read() {
+        match ev.action {
+            CharacterControllerEvent::MoveForward => {
+                for camera in camera_query.iter() {
+                    if let Ok(mut target_transform) = target_query.get_mut(camera.target) {
+                        let rotation_y = camera.rotate_y;
+                        target_transform.translation.x -=
+                            rotation_y.sin() * 10.0 * time.delta_seconds();
+                        target_transform.translation.z -=
+                            rotation_y.cos() * 10.0 * time.delta_seconds();
+
+                        target_transform.rotation = Quat::from_rotation_y(rotation_y);
+                    }
+                }
+            }
+            _ => (),
         }
     }
 }

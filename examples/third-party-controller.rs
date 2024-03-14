@@ -8,7 +8,13 @@ pub fn main() {
         .add_plugins(third_party_controller::ThirdPartyControllerPlugin)
         .insert_resource(ClearColor(Color::rgb(0.3, 0.3, 1.0)))
         .add_systems(Startup, (setup_object, grab_cursor))
-        .add_systems(Update, bevy::window::close_on_esc)
+        .add_systems(
+            Update,
+            (
+                bevy::window::close_on_esc,
+                third_party_controller::move_controller_plane,
+            ),
+        )
         .run();
 }
 
