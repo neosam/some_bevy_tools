@@ -1,9 +1,6 @@
 use std::f32::consts::PI;
 
-use bevy::{
-    input::mouse::{self, MouseWheel},
-    prelude::*,
-};
+use bevy::prelude::*;
 
 use crate::input::SliderMappingType;
 use crate::{input, third_party_camera};
@@ -17,12 +14,23 @@ pub struct ThirdPartyController {
 #[derive(Clone, Eq, PartialEq, Hash)]
 pub enum CharacterControllerEvent {
     Turn,
+    IncreaseCameraDistance,
+    DecreaseCameraDistance,
 }
 
 pub fn default_character_controller_event_mapping() -> input::InputMapping<CharacterControllerEvent>
 {
     input::InputMapping::from((
-        [],
+        [
+            (
+                input::UserInput::MouseScrollDown,
+                CharacterControllerEvent::IncreaseCameraDistance,
+            ),
+            (
+                input::UserInput::MouseScrollUp,
+                CharacterControllerEvent::DecreaseCameraDistance,
+            ),
+        ],
         [(
             SliderMappingType::MouseMove(10.0),
             CharacterControllerEvent::Turn,
@@ -33,7 +41,7 @@ pub fn default_character_controller_event_mapping() -> input::InputMapping<Chara
 }
 
 pub fn third_party_camera_controller_system(
-    mut scroll_events: EventReader<MouseWheel>,
+    mut action_events: EventReader<input::ActionEvent<CharacterControllerEvent>>,
     mut slider_events: EventReader<input::DirectionSliderEvent<CharacterControllerEvent>>,
     mut third_party_query: Query<(
         &ThirdPartyController,
@@ -41,14 +49,23 @@ pub fn third_party_camera_controller_system(
     )>,
 ) {
     bevy::log::info!("third_party-camera-controller-system");
-    for ev in scroll_events.read() {
-        let offset = match ev.unit {
-            mouse::MouseScrollUnit::Line => ev.y * 10.0,
-            mouse::MouseScrollUnit::Pixel => ev.y,
-        };
-        for (controller, mut camera) in third_party_query.iter_mut() {
-            camera.distance =
-                (camera.distance - offset).clamp(controller.min_distance, controller.max_distance);
+    for ev in action_events.read() {
+        match ev.action {
+            CharacterControllerEvent::IncreaseCameraDistance => {
+                let offset = 1.0;
+                for (controller, mut camera) in third_party_query.iter_mut() {
+                    camera.distance = (camera.distance - offset)
+                        .clamp(controller.min_distance, controller.max_distance);
+                }
+            }
+            CharacterControllerEvent::DecreaseCameraDistance => {
+                let offset = -1.0;
+                for (controller, mut camera) in third_party_query.iter_mut() {
+                    camera.distance = (camera.distance - offset)
+                        .clamp(controller.min_distance, controller.max_distance);
+                }
+            }
+            _ => (),
         }
     }
 

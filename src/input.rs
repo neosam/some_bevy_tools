@@ -42,7 +42,11 @@
 //!      //.run();
 //! ```
 
-use bevy::{input::mouse, prelude::*, utils::hashbrown::HashSet};
+use bevy::{
+    input::mouse::{self, MouseWheel},
+    prelude::*,
+    utils::hashbrown::HashSet,
+};
 use std::hash::Hash;
 
 #[derive(Resource)]
@@ -117,6 +121,8 @@ pub enum UserInput {
     KeyDown(KeyCode),
     KeyUp(KeyCode),
     KeyPressed(KeyCode),
+    MouseScrollUp,
+    MouseScrollDown,
 }
 
 #[derive(Clone)]
@@ -167,12 +173,24 @@ pub struct DirectionSliderEvent<Action> {
 
 pub fn input_mapping_system<Action: Clone + Eq + Hash + Send + Sync + 'static>(
     input: Res<ButtonInput<KeyCode>>,
+    mut scroll_events: EventReader<MouseWheel>,
     mut motion_events: EventReader<mouse::MouseMotion>,
     mut mapping: ResMut<InputMapping<Action>>,
     mut key_event_writer: EventWriter<ActionEvent<Action>>,
     mut direction_slider_event_writer: EventWriter<DirectionSliderEvent<Action>>,
     mut actions: Local<HashSet<Action>>,
 ) {
+    let mut scroll_up = false;
+    let mut scroll_down = false;
+
+    for scroll_event in scroll_events.read() {
+        if scroll_event.y < 0.0 {
+            scroll_up = true;
+        } else if scroll_event.y > 0.0 {
+            scroll_down = true;
+        }
+    }
+
     for item in mapping.mapping.iter_mut() {
         match item.input {
             UserInput::KeyDown(key) if input.just_pressed(key) => {
@@ -184,9 +202,16 @@ pub fn input_mapping_system<Action: Clone + Eq + Hash + Send + Sync + 'static>(
             UserInput::KeyPressed(key) if input.pressed(key) => {
                 actions.insert(item.action.clone());
             }
+            UserInput::MouseScrollUp if scroll_up => {
+                actions.insert(item.action.clone());
+            }
+            UserInput::MouseScrollDown if scroll_down => {
+                actions.insert(item.action.clone());
+            }
             _ => {}
         }
     }
+
     for action in actions.iter() {
         key_event_writer.send(ActionEvent {
             action: action.clone(),
