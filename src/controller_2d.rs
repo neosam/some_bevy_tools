@@ -54,3 +54,69 @@ impl Plugin for TopDownControllerPlugin {
             .add_systems(Startup, setup_top_down_mapping);
     }
 }
+
+#[derive(Component)]
+pub struct SimpleTopDownController {
+    pub speed: f32,
+    pub active: bool,
+}
+
+impl SimpleTopDownController {
+    pub fn new(speed: f32) -> Self {
+        Self {
+            speed,
+            active: true,
+        }
+    }
+}
+
+fn simple_top_down_controller(
+    mut actions: EventReader<input::ActionEvent<TopDownAction>>,
+    mut entity_query: Query<
+        (&SimpleTopDownController, &mut Transform),
+        With<SimpleTopDownController>,
+    >,
+) {
+    for action in actions.read() {
+        match action.action {
+            TopDownAction::MoveUp => {
+                for (controller, mut transform) in entity_query.iter_mut() {
+                    if controller.active {
+                        transform.translation.y += controller.speed;
+                    }
+                }
+            }
+            TopDownAction::MoveDown => {
+                for (controller, mut transform) in entity_query.iter_mut() {
+                    if controller.active {
+                        transform.translation.y -= controller.speed;
+                    }
+                }
+            }
+            TopDownAction::MoveLeft => {
+                for (controller, mut transform) in entity_query.iter_mut() {
+                    if controller.active {
+                        transform.translation.x -= controller.speed;
+                    }
+                }
+            }
+            TopDownAction::MoveRight => {
+                for (controller, mut transform) in entity_query.iter_mut() {
+                    if controller.active {
+                        transform.translation.x += controller.speed;
+                    }
+                }
+            }
+            _ => {}
+        }
+    }
+}
+
+pub struct SimpleTopDownControllerPlugin;
+
+impl Plugin for SimpleTopDownControllerPlugin {
+    fn build(&self, app: &mut App) {
+        app.add_plugins(TopDownControllerPlugin)
+            .add_systems(Update, simple_top_down_controller);
+    }
+}

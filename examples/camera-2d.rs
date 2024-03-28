@@ -1,14 +1,14 @@
 use bevy::prelude::*;
 use some_bevy_tools::camera_2d::Camera2DMode;
 use some_bevy_tools::camera_2d::{Camera2DController, Camera2DPlugin};
-use some_bevy_tools::controller_2d::{self, TopDownAction};
+use some_bevy_tools::controller_2d::{self, SimpleTopDownController, TopDownAction};
 use some_bevy_tools::input;
 
 pub fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
         .add_plugins(Camera2DPlugin)
-        .add_plugins(controller_2d::TopDownControllerPlugin)
+        .add_plugins(controller_2d::SimpleTopDownControllerPlugin)
         .add_systems(Startup, setup)
         .add_systems(Update, (action_handler, look_at_other_duck_system))
         .run();
@@ -28,6 +28,7 @@ pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
                 ..Default::default()
             },
             Duck1,
+            SimpleTopDownController::new(10.0),
         ))
         .id();
     commands.spawn((
@@ -45,32 +46,9 @@ pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     ));
 }
 
-fn action_handler(
-    mut actions: EventReader<input::ActionEvent<TopDownAction>>,
-    mut duck_query: Query<&mut Transform, With<Duck1>>,
-) {
+fn action_handler(mut actions: EventReader<input::ActionEvent<TopDownAction>>) {
     for action in actions.read() {
         match action.action {
-            TopDownAction::MoveUp => {
-                for mut duck_transform in duck_query.iter_mut() {
-                    duck_transform.translation.y += 10.0;
-                }
-            }
-            TopDownAction::MoveDown => {
-                for mut duck_transform in duck_query.iter_mut() {
-                    duck_transform.translation.y -= 10.0;
-                }
-            }
-            TopDownAction::MoveLeft => {
-                for mut duck_transform in duck_query.iter_mut() {
-                    duck_transform.translation.x -= 10.0;
-                }
-            }
-            TopDownAction::MoveRight => {
-                for mut duck_transform in duck_query.iter_mut() {
-                    duck_transform.translation.x += 10.0;
-                }
-            }
             TopDownAction::Exit => {
                 std::process::exit(0);
             }
@@ -88,7 +66,7 @@ enum CameraMovement {
 }
 
 fn look_at_other_duck_system(
-    original_duck_query: Query<Entity, With<Duck1>>,
+    mut original_duck_query: Query<(Entity, &mut SimpleTopDownController), With<Duck1>>,
     other_duck_query: Query<Entity, With<Duck2>>,
     mut actions: EventReader<input::ActionEvent<TopDownAction>>,
     mut camera_query: Query<&mut Camera2DController>,
@@ -103,6 +81,7 @@ fn look_at_other_duck_system(
                         camera_controller.target_entity = other_duck_query.single();
                         *camera_movement = CameraMovement::MoveToOtherDuck;
                         camera_controller.mode = Camera2DMode::Move;
+                        original_duck_query.single_mut().1.active = false;
                     }
                     _ => {}
                 }
@@ -111,7 +90,7 @@ fn look_at_other_duck_system(
         CameraMovement::MoveToOtherDuck => {
             let mut camera_controller = camera_query.single_mut();
             if camera_controller.is_at_target {
-                camera_controller.target_entity = original_duck_query.single();
+                camera_controller.target_entity = original_duck_query.single().0;
                 *camera_movement = CameraMovement::MoveBack;
             }
         }
@@ -120,6 +99,7 @@ fn look_at_other_duck_system(
             if camera_controller.is_at_target {
                 camera_controller.mode = Camera2DMode::Follow;
                 *camera_movement = CameraMovement::NoMovement;
+                original_duck_query.single_mut().1.active = true;
             }
         }
     }
