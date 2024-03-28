@@ -20,6 +20,7 @@
 //! Additionally, I try to document each module with at least one example. This should ensure that
 //! there are no accidential breaking changes.
 
+pub mod camera_2d;
 #[cfg(feature = "bevy_rapier2d")]
 pub mod collision_detection;
 #[cfg(feature = "bevy_rapier3d")]
