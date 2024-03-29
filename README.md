@@ -39,7 +39,7 @@ It will use rust stable on linux, with cache between different executions, those
 
 If you are using anything OS specific or rust nightly, you should update the file [ci.yaml](./.github/workflows/ci.yaml) to use those.
 
-## License
+## Code License
 
 * Apache License, Version 2.0
    ([LICENSE-APACHE-2.0](LICENSE-Apache-2.0) or <http://www.apache.org/licenses/LICENSE-2.0>)
@@ -48,8 +48,9 @@ If you are using anything OS specific or rust nightly, you should update the fil
 * CC0-1.0 License
    ([LICENSE-CC0-1.0](LICENSE-CC0-1.0) or <https://creativecommons.org/publicdomain/zero/1.0/legalcode>)
 
-The Ducky sprite is CC-0 licensed by [Caz Creates Games](https://caz-creates-games.itch.io/ducky-2).
-The eeh-eeh song is [CC-BY 4.0] (https://creativecommons.org/licenses/by/4.0/) licensed by [neosam](https://github.com/neosam).
+## Media License
+* The Ducky sprite is CC-0 licensed by [Caz Creates Games](https://caz-creates-games.itch.io/ducky-2).
+* The eeh-eeh song is [CC-BY 4.0] (https://creativecommons.org/licenses/by/4.0/) licensed by [neosam](https://github.com/neosam).
 
 ## Contribution
 
