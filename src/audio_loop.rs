@@ -170,6 +170,77 @@ pub struct AudioLoopPlugin;
 impl Plugin for AudioLoopPlugin {
     fn build(&self, app: &mut App) {
         app.add_audio_source::<LoopableAudioSource>()
-            .init_asset_loader::<LoopedAudioLoader>();
+            .init_asset_loader::<LoopedAudioLoader>()
+            .add_event::<AudioLoopEvent>()
+            .add_systems(PostUpdate, audio_loop_event_handler);
     }
+}
+
+#[derive(Event, Clone)]
+pub enum AudioLoopEvent {
+    StartPositionImmediate(f32, Handle<LoopableAudioSource>),
+    EndPositionImmediate(f32, Handle<LoopableAudioSource>),
+    StartPosition(f32, Handle<LoopableAudioSource>),
+    EndPosition(f32, Handle<LoopableAudioSource>),
+    LoopOffset(f32, Handle<LoopableAudioSource>),
+}
+
+pub fn audio_loop_event_handler(
+    mut audio_loops: ResMut<Assets<LoopableAudioSource>>,
+    mut audio_loop_events: EventReader<AudioLoopEvent>,
+    mut buffered_events: Local<Vec<AudioLoopEvent>>,
+) {
+    let mut rebuffered_events = Vec::new();
+    for event in buffered_events.drain(..) {
+        if !process_event(&event, audio_loops.as_mut()) {
+            rebuffered_events.push(event.clone());
+        }
+    }
+    buffered_events.append(&mut rebuffered_events);
+    for event in audio_loop_events.read() {
+        if !process_event(event, audio_loops.as_mut()) {
+            buffered_events.push(event.clone());
+        }
+    }
+}
+
+fn process_event(event: &AudioLoopEvent, audio_loops: &mut Assets<LoopableAudioSource>) -> bool {
+    match event {
+        AudioLoopEvent::StartPositionImmediate(position, handle) => {
+            if let Some(audio_loop) = audio_loops.get_mut(handle.clone()) {
+                audio_loop.set_loop_start_immediate(*position);
+            } else {
+                return false;
+            }
+        }
+        AudioLoopEvent::EndPositionImmediate(position, handle) => {
+            if let Some(audio_loop) = audio_loops.get_mut(handle.clone()) {
+                audio_loop.set_loop_end_immediate(*position);
+            } else {
+                return false;
+            }
+        }
+        AudioLoopEvent::StartPosition(position, handle) => {
+            if let Some(audio_loop) = audio_loops.get_mut(handle.clone()) {
+                audio_loop.set_loop_start(*position);
+            } else {
+                return false;
+            }
+        }
+        AudioLoopEvent::EndPosition(position, handle) => {
+            if let Some(audio_loop) = audio_loops.get_mut(handle.clone()) {
+                audio_loop.set_loop_end(*position);
+            } else {
+                return false;
+            }
+        }
+        AudioLoopEvent::LoopOffset(offset, handle) => {
+            if let Some(audio_loop) = audio_loops.get_mut(handle.clone()) {
+                audio_loop.add_loop_offset(*offset);
+            } else {
+                return false;
+            }
+        }
+    }
+    true
 }
