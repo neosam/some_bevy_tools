@@ -59,7 +59,7 @@ fn update(
         && *initialized == false
     {
         if let Some(audio_loop) = audio_loops.get_mut(audio_handles.audio_loop.clone()) {
-            audio_loop.set_loop_end(7.38);
+            audio_loop.set_loop_end_immediate(7.38);
             *initialized = true;
         }
     }
@@ -74,7 +74,7 @@ fn update(
             AppAction::PrevPart => {
                 let audio_loop = audio_handles.audio_loop.clone();
                 if let Some(audio_loop) = audio_loops.get_mut(audio_loop) {
-                    audio_loop.add_start_offset(-7.38);
+                    audio_loop.add_loop_offset(-7.38);
                 }
             }
         }

@@ -12,6 +12,8 @@ pub struct LoopableAudioSource {
     extracted_data: Vec<<bevy::prelude::AudioSource as Decodable>::DecoderItem>,
     loop_start: Arc<RwLock<f32>>,
     loop_end: Arc<RwLock<f32>>,
+    future_loop_start: Arc<RwLock<Option<f32>>>,
+    future_loop_end: Arc<RwLock<Option<f32>>>,
     sample_rate: u32,
     channels: u16,
     current_position: usize,
@@ -27,39 +29,44 @@ impl LoopableAudioSource {
             extracted_data,
             loop_start: Arc::new(RwLock::new(loop_start)),
             loop_end: Arc::new(RwLock::new(loop_end)),
+            future_loop_start: Arc::new(RwLock::new(None)),
+            future_loop_end: Arc::new(RwLock::new(None)),
             sample_rate,
             channels,
             current_position: 0,
         }
     }
 
-    pub fn set_loop_start(&mut self, loop_start: f32) {
+    pub fn set_loop_start_immediate(&mut self, loop_start: f32) {
         *self.loop_start.write().unwrap() = loop_start;
     }
 
-    pub fn set_loop_end(&mut self, loop_end: f32) {
+    pub fn set_loop_end_immediate(&mut self, loop_end: f32) {
         *self.loop_end.write().unwrap() = loop_end;
     }
 
-    pub fn add_loop_offset(&mut self, offset: f32) {
-        let mut loop_start = self.loop_start.write().unwrap();
-        let mut loop_end = self.loop_end.write().unwrap();
-        let range = *loop_end - *loop_start;
-        *loop_start = *loop_start + offset;
-        if *loop_start < 0.0 {
-            *loop_start = 0.0;
-            *loop_end = range;
-        } else {
-            *loop_end += offset;
-        }
+    pub fn set_loop_start(&mut self, loop_start: f32) {
+        *self.future_loop_start.write().unwrap() = Some(loop_start);
     }
 
-    pub fn add_start_offset(&mut self, offset: f32) {
-        let mut loop_start = self.loop_start.write().unwrap();
-        *loop_start = *loop_start + offset;
-        if *loop_start < 0.0 {
-            *loop_start = 0.0;
+    pub fn set_loop_end(&mut self, loop_end: f32) {
+        *self.future_loop_end.write().unwrap() = Some(loop_end);
+    }
+
+    pub fn add_loop_offset(&mut self, offset: f32) {
+        let loop_start =
+            (*self.future_loop_start.read().unwrap()).unwrap_or(*self.loop_start.read().unwrap());
+        let loop_end =
+            (*self.future_loop_end.read().unwrap()).unwrap_or(*self.loop_end.read().unwrap());
+        let range = loop_end - loop_start;
+        let mut new_loop_start = loop_start + offset;
+        let mut new_loop_end = loop_end + offset;
+        if loop_start < 0.0 {
+            new_loop_start = 0.0;
+            new_loop_end = range;
         }
+        self.set_loop_start(new_loop_start);
+        self.set_loop_end(new_loop_end);
     }
 }
 
@@ -67,7 +74,7 @@ impl Iterator for LoopableAudioSource {
     type Item = <bevy::prelude::AudioSource as Decodable>::DecoderItem;
 
     fn next(&mut self) -> Option<Self::Item> {
-        let loop_start = *self.loop_start.read().unwrap();
+        let mut loop_start = *self.loop_start.read().unwrap();
         let loop_end = *self.loop_end.read().unwrap();
         if self.current_position >= self.extracted_data.len() {
             self.current_position =
@@ -76,6 +83,19 @@ impl Iterator for LoopableAudioSource {
         let seconds =
             self.current_position as f32 / self.sample_rate() as f32 / self.channels() as f32;
         if seconds > loop_end {
+            let mut future_loop_start = self.future_loop_start.write().unwrap();
+            let mut future_loop_end = self.future_loop_end.write().unwrap();
+
+            if let Some(future_loop_start) = *future_loop_start {
+                *self.loop_start.write().unwrap() = future_loop_start;
+                loop_start = future_loop_start;
+            }
+            if let Some(future_loop_end) = *future_loop_end {
+                *self.loop_end.write().unwrap() = future_loop_end;
+            }
+            *future_loop_start = None;
+            *future_loop_end = None;
+
             self.current_position =
                 (loop_start * self.sample_rate() as f32 * self.channels() as f32) as usize;
         }
@@ -113,6 +133,8 @@ impl Decodable for LoopableAudioSource {
             extracted_data: self.extracted_data.clone(),
             loop_start: self.loop_start.clone(),
             loop_end: self.loop_end.clone(),
+            future_loop_start: self.future_loop_start.clone(),
+            future_loop_end: self.future_loop_end.clone(),
             sample_rate: self.sample_rate,
             channels: self.channels,
             current_position: 0,
