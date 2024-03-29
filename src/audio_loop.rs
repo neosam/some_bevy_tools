@@ -158,9 +158,7 @@ impl AssetLoader for LoopedAudioLoader {
         load_context: &'a mut bevy::asset::LoadContext,
     ) -> bevy::utils::BoxedFuture<'a, Result<Self::Asset, Self::Error>> {
         Box::pin(async move {
-            let audio_source = AudioLoader::default()
-                .load(reader, settings, load_context)
-                .await?;
+            let audio_source = AudioLoader.load(reader, settings, load_context).await?;
             Ok(LoopableAudioSource::new(audio_source, 0.0, f32::MAX))
         })
     }
