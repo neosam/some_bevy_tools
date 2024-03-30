@@ -41,7 +41,7 @@ some_bevy_tools = "0.2.1"
 By default, all features are enabled to get you started quickly.  To optimize the build, disable
 the default features and only use which is requied.
 
-The features core features of this crate are:
+The core features of this crate are:
 
 | Feature      | Description                                                    | Bevy features          |
 | ------------ | -------------------------------------------------------------- | ---------------------- |
