@@ -29,6 +29,45 @@ there are no accidential breaking changes.
 | 0.1     | 0.13 |
 | 0.2     | 0.13 |
 
+## Usage
+Make sure to use these lines in your Cargo.toml
+```toml
+[dependencies]
+bevy = "0.13.1"
+some_bevy_tools = "0.2.1"
+```
+
+## Features
+By default, all features are enabled to get you started quickly.  To optimize the build, disable
+the default features and only use which is requied.
+
+The features core features of this crate are:
+
+| Feature      | Description                                                    | Bevy features          |
+| ------------ | -------------------------------------------------------------- | ---------------------- |
+| audio_loop   | Adds support for looping inside of audio files (usually music) | bevy_audio, bevy_asset |
+| loading      | Load assets into resources using reflect.                      | bevy_asset             |
+| split_screen | Enables split screen support using two cameras.                | bevy_render            |
+| sbs_3d       | Allow 3D output using SBS (side-by-side) rendering.            | bevy_render            |
+
+These features add bevy_rapier as dependency:
+
+| Feature       | Description                                                   | Additional dependency |
+| ------------- | ------------------------------------------------------------- | --------------------- |
+| bevy_rapier2d | Simplify collision events                                     | bevy_rapier2d         |
+| bevy_rapier3d | Simplify collision events                                     | bevy_rapier3d         |
+
+These are just features which enable a bunch of bevy features required to do usual stuff to get started quickly
+but do not enable all of the bevy features.
+
+| Feature         | Description                                                  | Bevy features                                                                                                          |
+| --------------- | ------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------- |
+| audio_deluxe    | Adds audio and audio file formats                            | bevy_audio, vorbis, bevy_asset                                                                                         |
+| display_minimum | Only what is required to display a window and process events | x11, bevy_winit                                                                                                        |
+| display_deluxe  | Enable features which allow to draw sprites or 3D objects    | x11, bevy_winit, bevy_asset, bevy_render, bevy_sprite, png, bevy_pbr, tonemapping_luts                                 |
+| all             | Enable everything except for rapier                          | bevy_audio, vorbis, bevy_asset, x11, bevy_winit, bevy_asset, bevy_render, bevy_sprite, png, bevy_pbr, tonemapping_luts |
+
+
 ## CI (copied from the Bevy starter template)
 
 Definition: [.github/workflows/ci.yaml](./.github/workflows/ci.yaml)
