@@ -9,6 +9,10 @@ repository = "https://github.com/neosam/some_bevy_tools"
 homepage = "https://github.com/neosam/some_bevy_tools"
 keywords = ["gamedev", "bevy"]
 categories = ["game-development", "game-engines"]
+exclude = [
+    "assets/*",
+]
+
 
 # Compile with Performance Optimizations:
 # https://bevyengine.org/learn/book/getting-started/setup/#compile-with-performance-optimizations
@@ -34,8 +38,3 @@ bevy_rapier2d = { version = "0.25.0", features = [
 bevy_rapier3d = { version = "0.25.0", features = [
     "debug-render",
 ], optional = true }
-
-[package]
-exclude = [
-    "assets/*",
-]
