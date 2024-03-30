@@ -24,6 +24,7 @@ there are no accidential breaking changes.
 | Version | Bevy |
 | ------- | ---- |
 | 0.1     | 0.13 |
+| 0.2     | 0.13 |
 
 ## CI (copied from the Bevy starter template)
 
