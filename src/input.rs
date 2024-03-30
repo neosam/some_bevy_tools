@@ -143,6 +143,7 @@ impl<Action: PartialEq> From<(UserInput, Action)> for InputMappingItem<Action> {
 }
 
 #[derive(Clone, PartialEq, Eq)]
+#[non_exhaustive]
 pub enum UserInput {
     KeyDown(KeyCode),
     KeyUp(KeyCode),
@@ -160,6 +161,7 @@ pub struct DirectionalSliderMappingItem<Action> {
 }
 
 #[derive(Clone, PartialEq)]
+#[non_exhaustive]
 pub enum SliderMappingType {
     MouseMove(f32),
 }

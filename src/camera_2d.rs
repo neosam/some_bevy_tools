@@ -1,5 +1,8 @@
+//! Tools which helps with 2D cameras.
 use bevy::prelude::*;
 
+/// A 2D camera which automatically follows a target and allows to
+/// move to move to a different target.
 #[derive(Component)]
 pub struct Camera2DController {
     pub speed: f32,
@@ -10,6 +13,7 @@ pub struct Camera2DController {
 }
 
 impl Camera2DController {
+    /// A camera which follows the target entity.
     pub fn new_follow_with_speed(target_entity: Entity, speed: f32) -> Self {
         Self {
             speed,
@@ -21,11 +25,21 @@ impl Camera2DController {
     }
 }
 
+/// How the camera should behave.
 pub enum Camera2DMode {
+    /// Follows the target if the target is too far away. This is usual behavior
+    /// in 2D games where the player can move in the center of the image whithout
+    /// moveing the camera.  The camera only moves and follows if the player is
+    /// is too far away from the center.
     Follow,
+
+    /// Linear move to the target.
     Move,
 }
 
+/// System that handles the camera position.
+///
+/// At least the position of the entity which has the Camera2DController component.
 pub fn camera_2d_controller_system(
     mut camera_query: Query<(&mut Transform, &mut Camera2DController)>,
     target_query: Query<&Transform, Without<Camera2DController>>,
@@ -75,6 +89,7 @@ pub fn camera_2d_controller_system(
     }
 }
 
+/// Activate the Camera2D handling.
 pub struct Camera2DPlugin;
 
 impl Plugin for Camera2DPlugin {

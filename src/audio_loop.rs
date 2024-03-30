@@ -1,4 +1,46 @@
 //! Loop a music on a specific position.
+//!
+//! It introduces a new asset type called LoopableAudioSource which can be
+//! loaded with the bevy asset server or the loading feature of this crate.
+//!
+//! ## Example
+//! ```rust
+//! use bevy::prelude::*;
+//! use some_bevy_tools::audio_loop;
+//!
+//! #[derive(Resource)]
+//! pub struct AudioHandles {
+//!     pub audio_handle: Handle<audio_loop::LoopableAudioSource>,    
+//! }
+//!
+//! fn startup(mut commands: Commands, mut asset_server: ResMut<AssetServer>) {
+//!     let audio_source: Handle<audio_loop::LoopableAudioSource> = asset_server.load("ehh-ehh.ogg");
+//!     commands.spawn(AudioSourceBundle {
+//!         source: audio_source.clone(),
+//!         ..Default::default()
+//!     });
+//!
+//!     // Store the asset so we can change the loop points later.
+//!     commands.insert_resource(AudioHandles { audio_handle: audio_source });
+//! }
+//!
+//! fn update(
+//!     mut audio_events: EventWriter<audio_loop::AudioLoopEvent>,
+//!     audio_handles: Res<AudioHandles>,
+//! ) {
+//!     // Set the new start position which will be activated when the current end of the loop is reached.
+//!     audio_events.send(audio_loop::AudioLoopEvent::StartPosition(7.38, audio_handles.audio_handle.clone()));
+//!
+//!     // Set the new end position which will be activated when the current end of the loop is reached.
+//!     audio_events.send(audio_loop::AudioLoopEvent::EndPosition(7.38, audio_handles.audio_handle.clone()));
+//!
+//!     // Set the new start position which gets activated immediately.
+//!     audio_events.send(audio_loop::AudioLoopEvent::StartPositionImmediate(7.38, audio_handles.audio_handle.clone()));
+//!
+//!     // Set the new end position which gets activated immediately.  This is stop stop the current loop if the new stop
+//!     // position is before the current start position.
+//!     audio_events.send(audio_loop::AudioLoopEvent::EndPositionImmediate(7.38, audio_handles.audio_handle.clone()));
+//! }
 
 use std::sync::{Arc, RwLock};
 
