@@ -20,6 +20,7 @@
 //! Additionally, I try to document each module with at least one example. This should ensure that
 //! there are no accidential breaking changes.
 
+#[cfg(feature = "audio_loop")]
 pub mod audio_loop;
 pub mod camera_2d;
 #[cfg(feature = "bevy_rapier2d")]
@@ -29,9 +30,12 @@ pub mod collision_detection;
 pub mod controller_2d;
 pub mod despawn;
 pub mod input;
+#[cfg(feature = "loading")]
 pub mod loading;
 pub mod range;
+#[cfg(feature = "sbs_3d")]
 pub mod sbs_3d;
+#[cfg(feature = "split_screen")]
 pub mod split_screen;
 pub mod third_party_camera;
 pub mod third_party_controller;

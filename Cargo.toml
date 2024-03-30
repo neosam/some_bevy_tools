@@ -1,6 +1,6 @@
 [package]
 name = "some_bevy_tools"
-version = "0.2.0"
+version = "0.2.1"
 description = "A collection of tools which can be used in the Bevy Engine."
 edition = "2021"
 license = "MIT OR Apache-2.0 OR CC0-1.0"
@@ -26,15 +26,87 @@ opt-level = 1
 opt-level = 3
 
 [features]
-default = ["bevy_rapier2d"]
+default = ["all"]
 bevy_rapier2d = ["dep:bevy_rapier2d"]
 bevy_rapier3d = ["dep:bevy_rapier3d"]
 
-[dependencies]
-bevy = "0.13.0"
-bevy_rapier2d = { version = "0.25.0", features = [
-    "debug-render-2d",
-], optional = true }
-bevy_rapier3d = { version = "0.25.0", features = [
-    "debug-render",
-], optional = true }
+audio_loop = ["bevy/bevy_audio"]
+loading = ["bevy/bevy_asset"]
+split_screen = ["bevy/bevy_render"]
+sbs_3d = ["split_screen"]
+
+audio_deluxe = ["audio_loop", "bevy/vorbis", "bevy/bevy_asset"]
+display_minimum = ["bevy/x11", "bevy/bevy_winit"]
+display_deluxe = ["display_minimum", "bevy/bevy_asset", "bevy/bevy_render", "bevy/bevy_sprite", "bevy/png", "bevy/bevy_pbr", "bevy/tonemapping_luts"]
+all = ["audio_deluxe", "display_deluxe", "sbs_3d"]
+
+
+# Dependencies come here
+[dependencies.bevy]
+version = "0.13.0"
+default-features = false
+
+[dependencies.bevy_rapier2d]
+version = "0.25.0"
+features = ["debug-render-2d"]
+optional = true
+
+[dependencies.bevy_rapier3d]
+version = "0.25.0"
+features = ["debug-render"]
+optional = true
+
+[[example]]
+name  = "audio-loop"
+path = "examples/audio-loop.rs"
+required-features = ["audio_deluxe", "display_minimum"]
+
+[[example]]
+name = "auto-despawn"
+path = "examples/auto-despawn.rs"
+required-features = ["display_deluxe"]
+
+[[example]]
+name = "camera-2d"
+path = "examples/camera-2d.rs"
+required-features = ["display_deluxe"]
+
+[[example]]
+name = "cleanup"
+path = "examples/cleanup.rs"
+required-features = ["display_deluxe"]
+
+[[example]]
+name = "collision-detection"
+path = "examples/collision-detection.rs"
+required-features = ["display_deluxe", "bevy_rapier2d"]
+
+[[example]]
+name = "input-mapping"
+path = "examples/input-mapping.rs"
+required-features = ["display_deluxe"]
+
+[[example]]
+name  = "loading"
+path = "examples/loading.rs"
+required-features = ["loading", "audio_deluxe", "display_deluxe"]
+
+[[example]]
+name  = "split-screen"
+path = "examples/split-screen.rs"
+required-features = ["split_screen", "display_deluxe"]
+
+[[example]]
+name  = "sbs-3d"
+path = "examples/sbs-3d.rs"
+required-features = ["sbs_3d", "display_deluxe"]
+
+[[example]]
+name = "third-party-controller"
+path = "examples/third-party-controller.rs"
+required-features = ["display_deluxe"]
+
+[[example]]
+name = "x_axis_range"
+path = "examples/x_axis_range.rs"
+required-features = ["display_deluxe"]
