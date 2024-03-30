@@ -1,5 +1,5 @@
 //! Tools to support a third party camera.
-//! 
+//!
 //! The camera orbits a target entity. It can be rotated around the target entity and the distance can be changed.
 use bevy::prelude::*;
 
