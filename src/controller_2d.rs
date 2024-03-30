@@ -1,7 +1,7 @@
 //! Define some basic actions and keymapping to get started with
 //! 2D games quickly.
 
-use crate::input::{self, InputMapping, UserInput::*};
+use crate::input::{self, InputMapping, UserButtonInput::*};
 use bevy::prelude::*;
 
 #[derive(Clone, Eq, PartialEq, Hash)]

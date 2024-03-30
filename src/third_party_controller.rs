@@ -27,27 +27,27 @@ pub fn default_character_controller_event_mapping() -> input::InputMapping<Chara
     input::InputMapping::from((
         [
             (
-                input::UserInput::MouseScrollDown,
+                input::UserButtonInput::MouseScrollDown,
                 CharacterControllerEvent::IncreaseCameraDistance,
             ),
             (
-                input::UserInput::MouseScrollUp,
+                input::UserButtonInput::MouseScrollUp,
                 CharacterControllerEvent::DecreaseCameraDistance,
             ),
             (
-                input::UserInput::KeyPressed(KeyCode::KeyW),
+                input::UserButtonInput::KeyPressed(KeyCode::KeyW),
                 CharacterControllerEvent::MoveForward,
             ),
             (
-                input::UserInput::KeyPressed(KeyCode::KeyS),
+                input::UserButtonInput::KeyPressed(KeyCode::KeyS),
                 CharacterControllerEvent::MoveBackward,
             ),
             (
-                input::UserInput::KeyPressed(KeyCode::KeyA),
+                input::UserButtonInput::KeyPressed(KeyCode::KeyA),
                 CharacterControllerEvent::MoveLeft,
             ),
             (
-                input::UserInput::KeyPressed(KeyCode::KeyD),
+                input::UserButtonInput::KeyPressed(KeyCode::KeyD),
                 CharacterControllerEvent::MoveRight,
             ),
         ],

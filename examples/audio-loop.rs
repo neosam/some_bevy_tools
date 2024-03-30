@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 use some_bevy_tools::audio_loop::{AudioLoopEvent, LoopableAudioSource};
-use some_bevy_tools::input::UserInput::*;
+use some_bevy_tools::input::UserButtonInput::*;
 use some_bevy_tools::{audio_loop, input};
 
 fn main() {

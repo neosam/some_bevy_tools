@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use some_bevy_tools::input::UserInput::*;
+use some_bevy_tools::input::UserButtonInput::*;
 use some_bevy_tools::input::{self, InputMapping};
 
 #[derive(Debug, Default, Component)]
