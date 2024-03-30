@@ -16,6 +16,9 @@ Currently supported features are:
 * Split screen support.
 * SBS support. It is basically a split screen which allows a sterioscopic view by using special
   hardware like XReal or Virture glasses.
+* Loop music on specific positions and change the loop position while the music is playing
+* Third party camera and controller
+* 2D Camera and simple top down character controller
 
 Additionally, I try to document each module with at least one example. This should ensure that
 there are no accidential breaking changes.

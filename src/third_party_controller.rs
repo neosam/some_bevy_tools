@@ -1,3 +1,8 @@
+//! A third party controller system for a third person camera.
+//! 
+//! This system allows the player to control a camera in a third person perspective.
+//! The camera can be rotated around the player and moved in the x and z direction.
+//! It will produce events for mostly used user inputs.
 use std::f32::consts::PI;
 
 use bevy::prelude::*;
