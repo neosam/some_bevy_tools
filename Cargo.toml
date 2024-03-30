@@ -30,7 +30,7 @@ default = ["all"]
 bevy_rapier2d = ["dep:bevy_rapier2d"]
 bevy_rapier3d = ["dep:bevy_rapier3d"]
 
-audio_loop = ["bevy/bevy_audio"]
+audio_loop = ["bevy/bevy_audio", "bevy/bevy_asset"]
 loading = ["bevy/bevy_asset"]
 split_screen = ["bevy/bevy_render"]
 sbs_3d = ["split_screen"]

@@ -65,12 +65,6 @@ pub trait EasyAssetLoader {
 /// Keeps track of the overall asset loading.
 #[derive(Resource)]
 pub struct LoadAssets<S: States> {
-    /// Total bullshit at the moment.
-    pub splash_image_path: String,
-
-    /// Also total bullshit.
-    pub splash_image: Handle<Image>,
-
     /// This state will be set when all assets are loaded.
     pub target_state: S,
 
@@ -81,10 +75,8 @@ pub struct LoadAssets<S: States> {
     pub current_loaded_assets: u32,
 }
 impl<S: States> LoadAssets<S> {
-    pub fn new(path: String, target_state: S) -> Self {
+    pub fn new(target_state: S) -> Self {
         Self {
-            splash_image_path: path,
-            splash_image: Handle::default(),
             target_state,
             asset_count: 0,
             current_loaded_assets: 0,
@@ -182,7 +174,7 @@ pub fn load_assets_final_check<S: States + Clone>(
 pub struct LoadingPlugin<S: States + Clone>(pub S, pub S);
 impl<S: States> Plugin for LoadingPlugin<S> {
     fn build(&self, app: &mut App) {
-        app.insert_resource(LoadAssets::new("".into(), self.1.clone()))
+        app.insert_resource(LoadAssets::new(self.1.clone()))
             .add_systems(
                 Update,
                 (load_assets_reset::<S>, load_assets_final_check::<S>)
