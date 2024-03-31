@@ -1,6 +1,6 @@
 [package]
 name = "some_bevy_tools"
-version = "0.2.1"
+version = "0.2.2"
 description = "A collection of tools which can be used in the Bevy Engine."
 edition = "2021"
 license = "MIT OR Apache-2.0 OR CC0-1.0"
@@ -9,9 +9,7 @@ repository = "https://github.com/neosam/some_bevy_tools"
 homepage = "https://github.com/neosam/some_bevy_tools"
 keywords = ["gamedev", "bevy"]
 categories = ["game-development", "game-engines"]
-exclude = [
-    "assets/*",
-]
+exclude = ["assets/*"]
 
 
 # Compile with Performance Optimizations:
@@ -37,7 +35,15 @@ sbs_3d = ["split_screen"]
 
 audio_deluxe = ["audio_loop", "bevy/vorbis", "bevy/bevy_asset"]
 display_minimum = ["bevy/x11", "bevy/bevy_winit"]
-display_deluxe = ["display_minimum", "bevy/bevy_asset", "bevy/bevy_render", "bevy/bevy_sprite", "bevy/png", "bevy/bevy_pbr", "bevy/tonemapping_luts"]
+display_deluxe = [
+    "display_minimum",
+    "bevy/bevy_asset",
+    "bevy/bevy_render",
+    "bevy/bevy_sprite",
+    "bevy/png",
+    "bevy/bevy_pbr",
+    "bevy/tonemapping_luts",
+]
 all = ["audio_deluxe", "display_deluxe", "sbs_3d"]
 
 
@@ -57,7 +63,7 @@ features = ["debug-render"]
 optional = true
 
 [[example]]
-name  = "audio-loop"
+name = "audio-loop"
 path = "examples/audio-loop.rs"
 required-features = ["audio_deluxe", "display_minimum"]
 
@@ -87,17 +93,17 @@ path = "examples/input-mapping.rs"
 required-features = ["display_deluxe"]
 
 [[example]]
-name  = "loading"
+name = "loading"
 path = "examples/loading.rs"
 required-features = ["loading", "audio_deluxe", "display_deluxe"]
 
 [[example]]
-name  = "split-screen"
+name = "split-screen"
 path = "examples/split-screen.rs"
 required-features = ["split_screen", "display_deluxe"]
 
 [[example]]
-name  = "sbs-3d"
+name = "sbs-3d"
 path = "examples/sbs-3d.rs"
 required-features = ["sbs_3d", "display_deluxe"]
 
