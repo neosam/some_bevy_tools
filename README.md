@@ -4,6 +4,8 @@ This repo contains extensions for the great [Bevy Engine](https://bevyengine.org
 provides ECS stuff I regularly use in projects to save me time in future Bevy Game Jams.  This crate tries to
 make the usage as simple as possible so the developer can focus on the main content of the game.
 
+![Some Bevy Tools Logo](./assets/some-bevy-tools.png)
+
 Currently supported features are:
 
 * Automatic despawn after a period of time.
@@ -52,10 +54,10 @@ The core features of this crate are:
 
 These features add bevy_rapier as dependency:
 
-| Feature       | Description                                                   | Additional dependency |
-| ------------- | ------------------------------------------------------------- | --------------------- |
-| bevy_rapier2d | Simplify collision events                                     | bevy_rapier2d         |
-| bevy_rapier3d | Simplify collision events                                     | bevy_rapier3d         |
+| Feature       | Description               | Additional dependency |
+| ------------- | ------------------------- | --------------------- |
+| bevy_rapier2d | Simplify collision events | bevy_rapier2d         |
+| bevy_rapier3d | Simplify collision events | bevy_rapier3d         |
 
 These are just features which enable a bunch of bevy features required to do usual stuff to get started quickly
 but do not enable all of the bevy features.
