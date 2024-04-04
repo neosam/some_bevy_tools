@@ -58,7 +58,7 @@ pub struct LoopableAudioSource {
     future_loop_end: Arc<RwLock<Option<f32>>>,
     sample_rate: u32,
     channels: u16,
-    current_position: usize,
+    current_position: Arc<RwLock<usize>>,
 }
 
 impl LoopableAudioSource {
@@ -75,7 +75,7 @@ impl LoopableAudioSource {
             future_loop_end: Arc::new(RwLock::new(None)),
             sample_rate,
             channels,
-            current_position: 0,
+            current_position: Arc::new(RwLock::new(0)),
         }
     }
 
@@ -110,6 +110,39 @@ impl LoopableAudioSource {
         self.set_loop_start(new_loop_start);
         self.set_loop_end(new_loop_end);
     }
+
+    pub fn set_position(&mut self, position: f32) {
+        *self.current_position.write().unwrap() =
+            (position * self.sample_rate() as f32 * self.channels() as f32) as usize;
+    }
+
+    pub fn get_position(&self) -> f32 {
+        *self.current_position.read().unwrap() as f32
+            / self.sample_rate() as f32
+            / self.channels() as f32
+    }
+
+    pub fn move_position(&mut self, offset: f32) {
+        self.set_position((self.get_position() + offset).max(0.0));
+    }
+
+    pub fn move_loop_offset(&mut self, offset: f32) {
+        let loop_start =
+            (*self.future_loop_start.read().unwrap()).unwrap_or(*self.loop_start.read().unwrap());
+        let loop_end =
+            (*self.future_loop_end.read().unwrap()).unwrap_or(*self.loop_end.read().unwrap());
+        let range = loop_end - loop_start;
+        let position_offset = self.get_position() - loop_start;
+        let mut new_loop_start = loop_start + offset;
+        let mut new_loop_end = loop_end + offset;
+        if loop_start < 0.0 {
+            new_loop_start = 0.0;
+            new_loop_end = range;
+        }
+        self.set_loop_start_immediate(new_loop_start);
+        self.set_loop_end_immediate(new_loop_end);
+        self.set_position(new_loop_start + position_offset);
+    }
 }
 
 impl Iterator for LoopableAudioSource {
@@ -118,12 +151,13 @@ impl Iterator for LoopableAudioSource {
     fn next(&mut self) -> Option<Self::Item> {
         let mut loop_start = *self.loop_start.read().unwrap();
         let loop_end = *self.loop_end.read().unwrap();
-        if self.current_position >= self.extracted_data.len() {
-            self.current_position =
+        if *self.current_position.read().unwrap() >= self.extracted_data.len() {
+            *self.current_position.write().unwrap() =
                 (loop_start * self.sample_rate() as f32 * self.channels() as f32) as usize;
         }
-        let seconds =
-            self.current_position as f32 / self.sample_rate() as f32 / self.channels() as f32;
+        let seconds = *self.current_position.read().unwrap() as f32
+            / self.sample_rate() as f32
+            / self.channels() as f32;
         if seconds > loop_end {
             let mut future_loop_start = self.future_loop_start.write().unwrap();
             let mut future_loop_end = self.future_loop_end.write().unwrap();
@@ -138,11 +172,11 @@ impl Iterator for LoopableAudioSource {
             *future_loop_start = None;
             *future_loop_end = None;
 
-            self.current_position =
+            *self.current_position.write().unwrap() =
                 (loop_start * self.sample_rate() as f32 * self.channels() as f32) as usize;
         }
-        let result = Some(self.extracted_data[self.current_position]);
-        self.current_position += 1;
+        let result = Some(self.extracted_data[*self.current_position.read().unwrap()]);
+        *self.current_position.write().unwrap() += 1;
         result
     }
 }
@@ -179,7 +213,7 @@ impl Decodable for LoopableAudioSource {
             future_loop_end: self.future_loop_end.clone(),
             sample_rate: self.sample_rate,
             channels: self.channels,
-            current_position: 0,
+            current_position: self.current_position.clone(),
         }
     }
 }
@@ -223,6 +257,7 @@ pub enum AudioLoopEvent {
     StartPosition(f32, Handle<LoopableAudioSource>),
     EndPosition(f32, Handle<LoopableAudioSource>),
     LoopOffset(f32, Handle<LoopableAudioSource>),
+    LoopOffsetImmediate(f32, Handle<LoopableAudioSource>),
 }
 
 pub fn audio_loop_event_handler(
@@ -277,6 +312,13 @@ fn process_event(event: &AudioLoopEvent, audio_loops: &mut Assets<LoopableAudioS
         AudioLoopEvent::LoopOffset(offset, handle) => {
             if let Some(audio_loop) = audio_loops.get_mut(handle.clone()) {
                 audio_loop.add_loop_offset(*offset);
+            } else {
+                return false;
+            }
+        }
+        AudioLoopEvent::LoopOffsetImmediate(offset, handle) => {
+            if let Some(audio_loop) = audio_loops.get_mut(handle.clone()) {
+                audio_loop.move_loop_offset(*offset);
             } else {
                 return false;
             }

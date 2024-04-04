@@ -18,11 +18,17 @@ fn main() {
 /// Define the actions that can be triggered by user input
 #[derive(Clone, Eq, PartialEq, Hash)]
 enum AppAction {
-    /// Play the next part of the audio loop
+    /// Play the next part of the audio loop when the current loop is finished
     NextPart,
 
-    /// Play the previous part of the audio loop
+    /// Play the previous part of the audio loop when the current loop is finished
     PrevPart,
+
+    /// Jump to the next part and move the position as well
+    NextPartImmediate,
+
+    /// Jump to the previous part and move the position as well
+    PrevPartImmediate,
 }
 
 /// Resource to store the audio handles in order to modify the loop
@@ -61,9 +67,14 @@ fn setup(
     // Define the input mapping for the actions.  Space and right arrow will move the loop forward
     // and left arrow will move the loop backwards.
     let input_mapping: input::InputMapping<AppAction> = [
-        (KeyDown(KeyCode::Space), AppAction::NextPart),
         (KeyDown(KeyCode::ArrowRight), AppAction::NextPart),
         (KeyDown(KeyCode::ArrowLeft), AppAction::PrevPart),
+        (KeyDown(KeyCode::ArrowUp), AppAction::NextPartImmediate),
+        (KeyDown(KeyCode::ArrowDown), AppAction::PrevPartImmediate),
+        (KeyDown(KeyCode::KeyD), AppAction::NextPart),
+        (KeyDown(KeyCode::KeyA), AppAction::PrevPart),
+        (KeyDown(KeyCode::KeyW), AppAction::NextPartImmediate),
+        (KeyDown(KeyCode::KeyS), AppAction::PrevPartImmediate),
     ]
     .into();
     commands.insert_resource(input_mapping);
@@ -87,6 +98,20 @@ fn update(
             AppAction::PrevPart => {
                 // Tell the AudioLoopPlugin to move the loop position 7.38 seconds backwards.
                 audio_events.send(AudioLoopEvent::LoopOffset(
+                    -7.38,
+                    audio_handles.audio_loop.clone(),
+                ));
+            }
+            AppAction::NextPartImmediate => {
+                // Tell the AudioLoopPlugin to move the loop position 7.38 seconds forward.
+                audio_events.send(AudioLoopEvent::LoopOffsetImmediate(
+                    7.38,
+                    audio_handles.audio_loop.clone(),
+                ));
+            }
+            AppAction::PrevPartImmediate => {
+                // Tell the AudioLoopPlugin to move the loop position 7.38 seconds backwards.
+                audio_events.send(AudioLoopEvent::LoopOffsetImmediate(
                     -7.38,
                     audio_handles.audio_loop.clone(),
                 ));
