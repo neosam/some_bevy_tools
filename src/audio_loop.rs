@@ -126,6 +126,14 @@ impl LoopableAudioSource {
         self.set_position((self.get_position() + offset).max(0.0));
     }
 
+    pub fn set_loop_and_pos_immediate(&mut self, loop_start: f32, loop_end: f32, position: f32) {
+        self.set_loop_start_immediate(loop_start);
+        self.set_loop_end_immediate(loop_end);
+        self.set_position(position);
+        *self.future_loop_start.write().unwrap() = None;
+        *self.future_loop_end.write().unwrap() = None;
+    }
+
     pub fn move_loop_offset(&mut self, offset: f32) {
         let loop_start =
             (*self.future_loop_start.read().unwrap()).unwrap_or(*self.loop_start.read().unwrap());
@@ -258,6 +266,7 @@ pub enum AudioLoopEvent {
     EndPosition(f32, Handle<LoopableAudioSource>),
     LoopOffset(f32, Handle<LoopableAudioSource>),
     LoopOffsetImmediate(f32, Handle<LoopableAudioSource>),
+    LoopPosition(f32, f32, f32, Handle<LoopableAudioSource>),
 }
 
 pub fn audio_loop_event_handler(
@@ -319,6 +328,13 @@ fn process_event(event: &AudioLoopEvent, audio_loops: &mut Assets<LoopableAudioS
         AudioLoopEvent::LoopOffsetImmediate(offset, handle) => {
             if let Some(audio_loop) = audio_loops.get_mut(handle.clone()) {
                 audio_loop.move_loop_offset(*offset);
+            } else {
+                return false;
+            }
+        }
+        AudioLoopEvent::LoopPosition(loop_start, loop_end, position, handle) => {
+            if let Some(audio_loop) = audio_loops.get_mut(handle.clone()) {
+                audio_loop.set_loop_and_pos_immediate(*loop_start, *loop_end, *position);
             } else {
                 return false;
             }

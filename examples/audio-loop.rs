@@ -29,6 +29,12 @@ enum AppAction {
 
     /// Jump to the previous part and move the position as well
     PrevPartImmediate,
+
+    /// Play the whole song
+    PlaySong,
+
+    /// Play the first loop
+    PlayFirstLoop,
 }
 
 /// Resource to store the audio handles in order to modify the loop
@@ -75,6 +81,8 @@ fn setup(
         (KeyDown(KeyCode::KeyA), AppAction::PrevPart),
         (KeyDown(KeyCode::KeyW), AppAction::NextPartImmediate),
         (KeyDown(KeyCode::KeyS), AppAction::PrevPartImmediate),
+        (KeyDown(KeyCode::Space), AppAction::PlaySong),
+        (KeyDown(KeyCode::Enter), AppAction::PlayFirstLoop),
     ]
     .into();
     commands.insert_resource(input_mapping);
@@ -113,6 +121,22 @@ fn update(
                 // Tell the AudioLoopPlugin to move the loop position 7.38 seconds backwards.
                 audio_events.send(AudioLoopEvent::LoopOffsetImmediate(
                     -7.38,
+                    audio_handles.audio_loop.clone(),
+                ));
+            }
+            AppAction::PlaySong => {
+                audio_events.send(AudioLoopEvent::LoopPosition(
+                    0.0,
+                    f32::MAX,
+                    0.0,
+                    audio_handles.audio_loop.clone(),
+                ));
+            }
+            AppAction::PlayFirstLoop => {
+                audio_events.send(AudioLoopEvent::LoopPosition(
+                    0.0,
+                    7.38,
+                    0.0,
                     audio_handles.audio_loop.clone(),
                 ));
             }
