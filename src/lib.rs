@@ -29,6 +29,7 @@ pub mod collision_detection;
 pub mod collision_detection;
 pub mod controller_2d;
 pub mod despawn;
+pub mod health;
 pub mod input;
 #[cfg(feature = "loading")]
 pub mod loading;
