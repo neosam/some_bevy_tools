@@ -32,6 +32,8 @@ pub mod despawn;
 pub mod input;
 #[cfg(feature = "loading")]
 pub mod loading;
+#[cfg(feature = "bevy_rapier2d")]
+pub mod physics2d;
 pub mod range;
 #[cfg(feature = "sbs_3d")]
 pub mod sbs_3d;
@@ -39,3 +41,7 @@ pub mod sbs_3d;
 pub mod split_screen;
 pub mod third_party_camera;
 pub mod third_party_controller;
+#[cfg(feature = "bevy_rapier2d")]
+pub mod trigger;
+#[cfg(feature = "bevy_rapier3d")]
+pub mod trigger;
