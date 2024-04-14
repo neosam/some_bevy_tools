@@ -28,10 +28,27 @@ use bevy::prelude::*;
 
 /// Automatically despawns an entity after a certain amount of time.
 #[derive(Debug, Component)]
-pub struct AutoDespawn(pub Timer);
+pub enum AutoDespawn {
+    Timer(Timer),
+    Frames(u32),
+}
 impl AutoDespawn {
+    /// Create a new auto despawn which despwns in the given duration which is in seconds.
+    ///
+    /// # Deprecated
+    /// Use with_duration instead because it is also possible to auto despawn in a few frames.
+    #[deprecated]
     pub fn new(duration: f32) -> Self {
-        Self(Timer::from_seconds(duration, TimerMode::Once))
+        Self::with_duration(duration)
+    }
+
+    /// Create a new auto despawn which despwns in the given duration which is in seconds.
+    pub fn with_duration(duration: f32) -> Self {
+        AutoDespawn::Timer(Timer::from_seconds(duration, TimerMode::Once))
+    }
+
+    pub fn with_frames(frames: u32) -> Self {
+        AutoDespawn::Frames(frames)
     }
 }
 
@@ -42,8 +59,19 @@ pub fn auto_despawn_system(
     time: Res<Time>,
 ) {
     for (entity, mut auto_despawn) in query.iter_mut() {
-        if auto_despawn.0.tick(time.delta()).just_finished() {
-            commands.entity(entity).despawn_recursive();
+        match auto_despawn.as_mut() {
+            AutoDespawn::Timer(timer) => {
+                if timer.tick(time.delta()).just_finished() {
+                    commands.entity(entity).despawn_recursive();
+                }
+            }
+            AutoDespawn::Frames(frames) => {
+                if *frames == 0 {
+                    commands.entity(entity).despawn_recursive();
+                } else {
+                    *frames -= 1;
+                }
+            }
         }
     }
 }

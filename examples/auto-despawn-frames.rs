@@ -16,6 +16,6 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
             texture: asset_server.load("ducky.png"),
             ..Default::default()
         },
-        despawn::AutoDespawn::new(3.0),
+        despawn::AutoDespawn::with_frames(30),
     ));
 }

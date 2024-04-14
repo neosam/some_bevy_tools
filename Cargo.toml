@@ -68,8 +68,13 @@ path = "examples/audio-loop.rs"
 required-features = ["audio_deluxe", "display_minimum"]
 
 [[example]]
-name = "auto-despawn"
-path = "examples/auto-despawn.rs"
+name = "auto-despawn-seconds"
+path = "examples/auto-despawn-seconds.rs"
+required-features = ["display_deluxe"]
+
+[[example]]
+name = "auto-despawn-frames"
+path = "examples/auto-despawn-frames.rs"
 required-features = ["display_deluxe"]
 
 [[example]]
