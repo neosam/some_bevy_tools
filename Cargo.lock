@@ -2951,7 +2951,7 @@ dependencies = [
 
 [[package]]
 name = "some_bevy_tools"
-version = "0.2.2"
+version = "0.2.3"
 dependencies = [
  "bevy",
  "bevy_rapier2d",
